@@ -79,6 +79,12 @@
 
         <div id="quiz" style="display: none;">
             <div class="timer">เวลา: <span id="time">30</span> วินาที</div>
+            <div>
+                <div class="progress-container" style="width: 100%; height: 20px; background-color: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background-color: #4CAF50; transition: width 0.5s ease;"></div>
+                </div>
+                <p class="text-center">ข้อที่ <span id="current-number">1</span>/10</p>
+            </div>
             <div id="question"></div>
             <div id="options"></div>
         </div>
@@ -196,6 +202,8 @@
             }
 
             const questionData = questions[currentQuestion];
+            document.getElementById('current-number').textContent = currentQuestion + 1;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
             document.getElementById('question').innerHTML = `
                 <h3 style="color: #1E40AF; background-color: #EFF6FF; padding: 10px; border-radius: 5px; border-left: 4px solid #1E40AF;">
                     ${questionData.question}
