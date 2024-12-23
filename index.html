@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แบบทดสอบเรื่องวันครู</title>
+    <style>
+        body {
+            background-color: #E6F3FF;
+            font-family: 'Sarabun', sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .question {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .option {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .timer {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        #nameInput {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+        #result, #history {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .history-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>แบบทดสอบเรื่องวันครู</h1>
+        
+        <div id="instructions">
+            <h2>คำชี้แจง</h2>
+            <p>1. แบบทดสอบมีทั้งหมด 10 ข้อ</p>
+            <p>2. แต่ละข้อมีเวลาทำ 30 วินาที</p>
+            <p>3. เลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว</p>
+            <input type="text" id="nameInput" placeholder="กรุณากรอกชื่อ-นามสกุล" required>
+            <button onclick="startQuiz()">เริ่มทำแบบทดสอบ</button>
+        </div>
+
+        <div id="quiz" style="display: none;">
+            <div class="timer">เวลา: <span id="time">30</span> วินาที</div>
+            <div id="question"></div>
+            <div id="options"></div>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "วันครูตรงกับวันที่เท่าไร?",
+                options: ["15 มกราคม", "16 มกราคม", "17 มกราคม", "18 มกราคม"],
+                answer: 1
+            },
+            {
+                question: "วันครูเริ่มมีครั้งแรกในปี พ.ศ. ใด?",
+                options: ["2500", "2501", "2502", "2503"],
+                answer: 1
+            },
+            {
+                question: "ข้อใดคือความหมายของคำว่า 'ครู'?",
+                options: ["ผู้สั่งสอน", "ผู้ถ่ายทอด", "ผู้ชี้ทางสว่าง", "ถูกทุกข้อ"],
+                answer: 3
+            },
+            {
+                question: "สีประจำวันครูคือสีใด?",
+                options: ["สีเหลือง", "สีชมพู", "สีฟ้า", "สีม่วง"],
+                answer: 0
+            },
+            {
+                question: "ใครเป็นผู้ริเริ่มให้มีการจัดงานวันครู?",
+                options: ["จอมพล ป. พิบูลสงคราม", "จอมพล สฤษดิ์ ธนะรัชต์", "พระบาทสมเด็จพระเจ้าอยู่หัวรัชกาลที่ 9", "พระยาศรีวิสารวาจา"],
+                answer: 1
+            },
+            {
+                question: "'บูชาพระคุณครู' ตรงกับคำในภาษาบาลีว่าอย่างไร?",
+                options: ["ปูชนียบุคคล", "ปาเจราจริยา", "บูรพาจารย์", "คุรุคารวตา"],
+                answer: 1
+            },
+            {
+                question: "ดอกไม้ประจำวันครูคือดอกไม้ชนิดใด?",
+                options: ["ดอกกล้วยไม้", "ดอกกุหลาบ", "ดอกเข็ม", "ดอกพุทธรักษา"],
+                answer: 0
+            },
+            {
+                question: "พิธีระลึกถึงพระคุณครูเรียกว่าอะไร?",
+                options: ["พิธีบูชาครู", "พิธีไหว้ครู", "พิธีครอบครู", "พิธีกรรมครู"],
+                answer: 1
+            },
+            {
+                question: "คำขวัญวันครูคือข้อใด?",
+                options: ["ชาติพัฒนา ด้วยครูดี", "ครูดี ศิษย์ดี มีพัฒนา", "ครูคือปูชนียบุคคล", "ครูสร้างคน คนสร้างชาติ"],
+                answer: 0
+            },
+            {
+                question: "เหตุใดจึงกำหนดให้วันที่ 16 มกราคมเป็นวันครู?",
+                options: ["เป็นวันประกาศพระราชบัญญัติครู", "เป็นวันก่อตั้งกระทรวงศึกษาธิการ", "เป็นวันสถาปนาคุรุสภา", "เป็นวันเกิดของผู้ก่อตั้งวันครู"],
+                answer: 0
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timer;
+        let timeLeft;
+        let userAnswers = [];
+        let quizHistory = [];
+
+        function startQuiz() {
+            const name = document.getElementById('nameInput').value;
+            if (!name) {
+                alert('กรุณากรอกชื่อ-นามสกุล');
+                return;
+            }
+            
+            // Shuffle questions
+            shuffleQuestions();
+            
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            showQuestion();
+        }
+
+        function shuffleQuestions() {
+            // Copy original questions array
+            const originalQuestions = [...questions];
+            
+            // Clear questions array
+            questions.length = 0;
+            
+            // Re-add questions in order with shuffled options
+            for (let i = 0; i < originalQuestions.length; i++) {
+                const q = {...originalQuestions[i]};
+                
+                // Shuffle options
+                const options = [...q.options];
+                const correctAnswer = options[q.answer];
+                
+                for (let k = options.length - 1; k > 0; k--) {
+                    const l = Math.floor(Math.random() * (k + 1));
+                    [options[k], options[l]] = [options[l], options[k]];
+                }
+                
+                q.options = options;
+                q.answer = options.indexOf(correctAnswer);
+                questions.push(q);
+            }
+        }
+
+        function showQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResult();
+                return;
+            }
+
+            const questionData = questions[currentQuestion];
+            document.getElementById('question').innerHTML = `
+                <h3 style="color: #1E40AF; background-color: #EFF6FF; padding: 10px; border-radius: 5px; border-left: 4px solid #1E40AF;">
+                    ${questionData.question}
+                </h3>`;
+
+            const optionsHTML = questionData.options.map((option, index) => `
+                <div class="option" onclick="selectAnswer(${index})" 
+                     style="transition: all 0.3s ease;">
+                    ${['ก', 'ข', 'ค', 'ง'][index]}. ${option}
+                </div>
+            `).join('');
+
+            document.getElementById('options').innerHTML = optionsHTML;
+            
+            timeLeft = 30;
+            updateTimer();
+            if (timer) clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            document.getElementById('time').textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                currentQuestion++;
+                showQuestion();
+            }
+            timeLeft--;
+        }
+
+        function selectAnswer(selectedOption) {
+            clearInterval(timer);
+            userAnswers[currentQuestion] = selectedOption;
+            if (selectedOption === questions[currentQuestion].answer) {
+                score++;
+            }
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function showResult() {
+            const name = document.getElementById('nameInput').value;
+            const result = {
+                name: name,
+                score: score,
+                date: new Date().toLocaleString('th-TH'),
+                totalQuestions: questions.length
+            };
+            
+            quizHistory.push(result);
+
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').innerHTML = `
+                <h2>ผลการทดสอบ</h2>
+                <p>คุณ ${name}</p>
+                <p>ได้คะแนน ${score} คะแนน จากทั้งหมด ${questions.length} คะแนน</p>
+                <button onclick="showAnswers()">แสดงเฉลย</button>
+                <button onclick="showHistory()">ประวัติการทดสอบ</button>
+                <button onclick="restartQuiz()">เริ่มทำใหม่</button>
+                <div id="answers" style="display:none; margin-top: 20px;"></div>
+                <div id="history" style="display:none; margin-top: 20px;"></div>
+            `;
+        }
+
+        function showAnswers() {
+            const answersHTML = questions.map((q, index) => `
+                <div style="margin: 10px 0;">
+                    <p><strong>${q.question}</strong></p>
+                    <p style="color: ${userAnswers[index] === q.answer ? 'green' : 'red'}">
+                        คำตอบของคุณ: ${['ก', 'ข', 'ค', 'ง'][userAnswers[index]]}. ${q.options[userAnswers[index]]}
+                    </p>
+                    <p style="color: green;">
+                        เฉลย: ${['ก', 'ข', 'ค', 'ง'][q.answer]}. ${q.options[q.answer]}
+                    </p>
+                </div>
+            `).join('');
+            document.getElementById('answers').innerHTML = answersHTML;
+            document.getElementById('answers').style.display = 'block';
+            document.getElementById('history').style.display = 'none';
+        }
+
+        function showHistory() {
+            const history = quizHistory;
+            const historyHTML = history.map(result => `
+                <div class="history-item">
+                    <p>ชื่อ: ${result.name}</p>
+                    <p>คะแนน: ${result.score}/${result.totalQuestions}</p>
+                    <p>วันที่: ${result.date}</p>
+                </div>
+            `).join('');
+            
+            document.getElementById('history').innerHTML = `
+                <h3>ประวัติการทดสอบ</h3>
+                ${historyHTML}
+            `;
+            document.getElementById('history').style.display = 'block';
+            document.getElementById('answers').style.display = 'none';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('instructions').style.display = 'block';
+            document.getElementById('nameInput').value = '';
+        }
+    </script>
+</body>
+</html>
